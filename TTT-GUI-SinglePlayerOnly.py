@@ -3,10 +3,6 @@ import tkinter.font
 
 ######################
 ###### SETTINGS ######
-# players/ai/network #
-gamemode = "ai"      #
-# simple/advanced    #
-aiType = "simple"    #
 # size of the board  #
 boardSize = 3        #
 ######################
@@ -18,17 +14,22 @@ boardSize = 3        #
 #>> Setup the initial labels for the board and number of turns taken
 labels = [""] * boardSize**2
 turn = 0
+gameFinished = False
 
 #################
 ### FUNCTIONS ###
 #################
 
-def playTurn(labels, pos, turn):
+def playTurn(labels, pos):
+    global turn
+    
     if(turn%2 == 0):
         labels[pos] = "X"
     else:
         labels[pos] = "O"
 
+    turn += 1
+    
     return labels
 
 def checkHor(labels, size):
@@ -174,116 +175,6 @@ def checkWin():
         return check2
     return check
 
-def aiRandom(labels):
-    numFound = False
-    while(numFound == False):
-        num = random.randrange(9)
-        if(labels[num] != "X" and labels[num] != "O"):
-            numFound = True
-
-    return num
-
-def aiSARhor(labels, size):
-    count = 0
-    while(count < size):
-        count2 = count*size
-        found = 0
-        while(count2 < (count+1)*size):
-            if(labels[count2] == "X"):
-                found += 1
-
-            if(found > size-2):
-                count3 = count*size
-                while(count3 < (count+1)*size):
-                    if(labels[count3] != "X" and labels[count3] != "O"):
-                        return count3
-                    count3 += 1
-            count2 += 1
-        count += 1
-    return (-1)
-
-def aiSARver(labels, size):
-    count = 0
-    while(count < size):
-        count2 = 0
-        found = 0
-        while(count2 < size):
-            if(labels[count+count2*size] == "X"):
-                found += 1
-
-            if(found > size-2):
-                count3 = 0
-                while(count3 < size):
-                    if(labels[count+count3*size] != "X" and labels[count+count3*size] != "O"):
-                        return count+count3*size
-                    count3 += 1
-            count2 += 1
-        count += 1
-    return (-1)
-
-def aiSARdia(labels, size):
-    count = 0
-    found = 0
-    #>> check top left to bottom right
-    while(count < size):
-        if(labels[count*size+count] == "X"):
-            found +=1
-
-        if(found > size-2):
-            count2 = 0
-            while(count2 < size):
-                if(labels[count2*size+count2] != "X" and labels[count2*size+count2] != "O"):
-                    return count2*size+count2
-                count2 += 1
-        count += 1
-    #>> check top right to bottom left
-    count = 0
-    found = 0
-    while(count < size):
-        if(labels[(size-1)*(count+1)] == "X"):
-            found += 1
-
-        if(found > size-2):
-            count2 = 0
-            while(count2 < size):
-                if(labels[(size-1)*(count2+1)] != "X" and labels[(size-1)*(count2+1)] != "O"):
-                    return (size-1)*(count2+1)
-                count2 += 1
-        count += 1
-        
-    return (-1)
-
-def aiSearchAndRandom(labels):
-    #>> This AI searches the board for oppenent about to win, if none is found, a random position is taken
-    #>> This AI currently only works for 3x3 boards
-    size = 3
-    #>> Check horizontals
-    result = aiSARhor(labels, size)
-    if(result != (-1)):
-        return result
-    #>> Check verticals
-    result = aiSARver(labels, size)
-    if(result != (-1)):
-        return result
-    #>> Check diagonals
-    result = aiSARdia(labels, size)
-    if(result != (-1)):
-        return result
-
-    result = aiRandom(labels)
-    return result
-
-def ai(aiVer, labels):
-    if(aiVer == "simple"):
-        num = aiRandom(labels)
-    elif(aiVer == "advanced"):
-        num = aiSearchAndRandom(labels)
-    else:
-        print("Not a valid AI mode!")
-        pass
-
-    return num
-
 def validatePos(pos, size, labels):
     if(pos >= 0 and pos < size**2):
         if(labels[pos] != "X" and labels[pos] != "O"):
@@ -294,26 +185,46 @@ def validatePos(pos, size, labels):
         return False
 
 def btnPress(btnNum):
-    #>> Check if move is valid
+    global labels
+    global gameFinished
 
-    #>> Make move
+    if(gameFinished == False):
+        #>> Check if move is valid
+        checkValid = validatePos(btnNum-1, 3, labels)
+        #>> Make move
+        if(checkValid == True):
+            labels = playTurn(labels, btnNum-1)
+        #>> Check for win/draw
+        check = checkWin()
+        if(check == "-"):
+            #>> Move turn onto next player
+            print("No win found!")
+            return
+        elif(check == "X"):
+            print("Player 1 has won!")
+            lblInfo.config(text = "Player 1 has won!")
+            gameFinished = True
+            return
+        elif(check == "O"):
+            print("Player 2 has won!")
+            lblInfo.config(text = "Player 2 has won!")
+            gameFinished = True
+            return
+        elif(check == "DRAW"):
+            print("Game has ended in a draw!")
+            lblInfo.config(text = "Draw!")
+            gameFinished = True
+            return
+        else:
+            print("ERROR: playerThread >> checkWin() returned:: " + str(check))
+            gameFinished = True
+            return
 
-    #>> Update display
-
-    #>> Check for win/draw
-    check = checkWin()
-    if(check == "-"):
-        #>> Move turn onto next player
-        print("No win found!")
-    elif(check == "X"):
-        print("Player 1 has won!")
-    elif(check == "O"):
-        print("Player 2 has won!")
-    elif(check == "DRAW"):
-        print("Game has ended in a draw!")
-    else:
-        print("ERROR: playerThread >> checkWin() returned:: " + str(check))
-    return
+        if(turn%2 == 0):
+            lblInfo.config(text = "Player 1's turn!")
+        else:
+            lblInfo.config(text = "Player 1's turn!")
+        return
 
 ########################
 ### BUTTON FUNCTIONS ###
