@@ -21,7 +21,7 @@ currTurn = 0
 #>> labels[9] = current turn
 #>> labels[10] = data sent type
 #>> labels[11] = data sent
-labels = ['0', '1', '2', '3', '4', '5', '6', '7', '8', str(currTurn), 'empty', '']
+labels = ['', '', '', '', '', '', '', '', '', str(currTurn), 'empty', '']
 
 #################
 ### Functions ###
