@@ -1,9 +1,10 @@
 import tkinter as tk
 import tkinter.font
+import random
 
 ######################
 ###### SETTINGS ######
-# players/ai/network #
+# players/ai         #
 gamemode = "ai"      #
 # simple/advanced    #
 aiType = "simple"    #
@@ -173,10 +174,11 @@ def checkWin():
     if(check == "X" or check == "O"):
         return check
     check = checkDia(labels, boardSize)
-
-    check2 = checkEnd(labels, boardSize)
-    if(check2 == "DRAW"):
-        return check2
+    if(check == "X" or check == "O"):
+        return check
+    check = checkEnd(labels, boardSize)
+    if(check == "DRAW"):
+        return check
     return check
 
 def aiRandom(labels):
@@ -285,7 +287,6 @@ def ai(aiVer, labels):
         num = aiSearchAndRandom(labels)
     else:
         print("Not a valid AI mode!")
-        pass
 
     return num
 
@@ -297,6 +298,17 @@ def validatePos(pos, size, labels):
             return False
     else:
         return False
+
+def updateButtons():
+    btnOne.config(text = labels[0])
+    btnTwo.config(text = labels[1])
+    btnThree.config(text = labels[2])
+    btnFour.config(text = labels[3])
+    btnFive.config(text = labels[4])
+    btnSix.config(text = labels[5])
+    btnSeven.config(text = labels[6])
+    btnEight.config(text = labels[7])
+    btnNine.config(text = labels[8])
 
 def btnPress(btnNum):
     global labels
@@ -313,7 +325,6 @@ def btnPress(btnNum):
         if(check == "-"):
             #>> Move turn onto next player
             print("No win found!")
-            return
         elif(check == "X"):
             print("Player 1 has won!")
             lblInfo.config(text = "Player 1 has won!")
@@ -333,11 +344,28 @@ def btnPress(btnNum):
             print("ERROR: playerThread >> checkWin() returned:: " + str(check))
             gameFinished = True
             return
-
+        
         if(turn%2 == 0):
             lblInfo.config(text = "Player 1's turn!")
         else:
-            lblInfo.config(text = "Player 1's turn!")
+            if(gamemode == "players"):
+                lblInfo.config(text = "Player 2's turn!")
+            elif(gamemode == "ai"):
+                labels = playTurn(labels, ai(aiType, labels))
+                updateButtons()
+                check = checkWin()
+                if(check == "O"):
+                    print("AI has won!")
+                    lblInfo.config(text = "AI has won!")
+                    gameFinished = True
+                    return
+                elif(check == "DRAW"):
+                    print("Game has ended in a draw!")
+                    lblInfo.config(text = "Draw!")
+                    gameFinished = True
+                    return
+            else:
+                print("ERROR:: Unknown gamemode >> " + str(gamemode))
         return
 
 ########################
