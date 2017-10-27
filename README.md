@@ -1,5 +1,5 @@
 # tic-tac-toe-g
-Networked version of Tic-Tac-Toe
+GUI version of Tic-Tac-Toe
 
 
 This is my testing version for my project at Coventry University
