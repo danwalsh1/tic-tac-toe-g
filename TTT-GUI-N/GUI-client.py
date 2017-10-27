@@ -188,13 +188,15 @@ lblPlayerNum.grid(row = 3, column = 0)
 lblInfo = tk.Label(root, text="Your turn!", font=("Helvetica", 13), bg = systemColour)
 lblInfo.grid(row = 3, column = 1)
 
-root.mainloop()
+#root.mainloop()
 
 sock.connect((hostIP, port))
 
 iThread = t.Thread(target=recvFromServer)
 iThread.daemon = True
 iThread.start()
+
+root.mainloop()
 
 while(True):
     x = input("Press enter to exit!")
