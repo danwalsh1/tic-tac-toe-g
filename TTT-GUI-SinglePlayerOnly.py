@@ -223,7 +223,7 @@ def btnPress(btnNum):
         if(turn%2 == 0):
             lblInfo.config(text = "Player 1's turn!")
         else:
-            lblInfo.config(text = "Player 1's turn!")
+            lblInfo.config(text = "Player 2's turn!")
         return
 
 ########################
